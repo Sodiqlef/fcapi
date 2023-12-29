@@ -45,7 +45,7 @@ def clubs(request):
         return Response(data)
     
 
-@api_view(['GET', 'PUT'])
+@api_view(['GET', 'PUT', "DELETE"])
 def club(request, name):
     try:
         club = Club.objects.get(name=name)
@@ -54,12 +54,15 @@ def club(request, name):
             data = club_serializer.data
         if request.method == "PUT":
             club.name = request.data['name'],
-            club.number_of_players = int(request.data['number_of_players']) ,
+            club.number_of_players = request.data['number_of_players'] ,
             club.position = int(request.data['position'])
             club.save()
             club_serializer = ClubSerializer(club, many=False)
             data = club_serializer.data
-
+        if request.method == "DELETE":
+            club.delete()
+            club_serializer = ClubSerializer(club, many=False)
+            data = club_serializer.data
     except ObjectDoesNotExist:
         data = {    'Return real object'}
     return Response(data)
