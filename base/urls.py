@@ -19,6 +19,6 @@ from django.urls import path
 
 urlpatterns = [
     path('endpoint/', views.endpoints, name="endpoints"),
-    path('clubs/', views.clubs, name='clubs' )
-
+    path('clubs/', views.clubs, name='clubs' ),
+    path('club/<str:name>', views.club, name='club' )
 ]
