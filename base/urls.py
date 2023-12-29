@@ -15,10 +15,15 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from . import views
-from django.urls import path
+from django.urls import path, re_path
 
 urlpatterns = [
     path('endpoint/', views.endpoints, name="endpoints"),
     path('clubs/', views.clubs, name='clubs' ),
-    path('club/<str:name>', views.club, name='club' )
+    path('leagues/', views.leagues, name='leagues' ),
+
+
+    
+    re_path(r'^(?i)club/<str:name>/$', views.club, name='club' ),
+    re_path(r'^(?i)league/<str:name>/$', views.league, name='league'),
 ]

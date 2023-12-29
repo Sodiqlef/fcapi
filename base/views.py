@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
 from .models import Club, League, Player
-from .serializer import ClubSerializer
+from .serializer import ClubSerializer, LeagueSerializer
 
 # Create your views here.
 
@@ -66,3 +66,50 @@ def club(request, name):
     except ObjectDoesNotExist:
         data = {    'Return real object'}
     return Response(data)
+
+
+@api_view(["GET", "POST"])
+def leagues(request):
+    query = request.GET.get('query')
+    if query == None:
+            leagues = League.objects.all()
+    else:
+        leagues = League.objects.filter(Q(name__icontains = query))
+        
+    if request.method == "GET":        
+        leagues_serializer = LeagueSerializer(leagues, many=True)
+        data = leagues_serializer.data
+        return Response(data)
+    
+    if request.method == "POST":
+        league = League.objects.create(
+            name = request.data['name'],
+            country = request.data['country'],
+            number_of_teams = request.data['number_of_teams'],
+        )
+        league_serializer = LeagueSerializer(leagues, many=True)
+        data = league_serializer.data
+        return Response(data)
+    
+
+@api_view(['GET', 'PUT', "DELETE"])
+def league(request, name):
+    try:
+        league = League.objects.get(name=name)
+        if request.method == "GET":
+            league_serializer = LeagueSerializer(league, many=False)
+            data = league_serializer.data
+        if request.method == "PUT":
+            league.name = request.data['name'],
+            league.country = request.data['country'] ,
+            league.number_of_teams = int(request.data['number_of_teams'])
+            league.save()
+            league_serializer = LeagueSerializer(league, many=False)
+            data = league_serializer.data
+        if request.method == "DELETE":
+            league.delete()
+            league_serializer = LeagueSerializer(league, many=False)
+            data = league_serializer.data
+    except ObjectDoesNotExist:
+        data = {    'The league you are trying to access does not exist'}
+    return Response(data, status=404)
